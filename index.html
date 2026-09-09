@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b2540" />
+    <title>Commission Statement Builder | Home Front Solutions</title>
+    <meta name="description" content="Create branded Home Front Solutions commission statements as PDF files." />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.4/dist/jspdf.plugin.autotable.min.js" defer></script>
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="masthead__inner">
+        <img src="./assets/logo-dark-theme-140.webp" alt="Home Front Solutions" width="112" height="112" />
+        <div>
+          <p class="eyebrow">Home Front Solutions</p>
+          <h1>Commission Statement Builder</h1>
+          <p>Create a clean, branded PDF in under a minute.</p>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel intro" aria-labelledby="statement-heading">
+        <div>
+          <p class="step">Statement details</p>
+          <h2 id="statement-heading">Who is this statement for?</h2>
+        </div>
+        <p class="privacy">Private by design — entries stay on this device.</p>
+        <div class="details-grid">
+          <label>Representative name<input id="repName" autocomplete="name" placeholder="Saad Qadir" required /></label>
+          <label>Statement date<input id="statementDate" type="date" required /></label>
+          <label>Status<select id="statementStatus"><option>Pending</option><option>Approved</option><option>Paid</option></select></label>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="orders-heading">
+        <div class="section-heading">
+          <div><p class="step">Order details</p><h2 id="orders-heading">Enter the commission items</h2></div>
+          <button class="button button--secondary" id="addOrder" type="button">+ Add order</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Order #</th><th>Customer</th><th>Activation</th><th>Product</th><th>Commission</th><th><span class="sr-only">Remove</span></th></tr></thead>
+            <tbody id="orderRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="summary" aria-live="polite">
+        <div><span>Orders</span><strong id="orderCount">1</strong></div>
+        <div><span>Total commission</span><strong id="commissionTotal">$0.00</strong></div>
+        <button class="button button--primary" id="generatePdf" type="button">Download branded PDF</button>
+      </section>
+      <p id="message" class="message" role="status"></p>
+    </main>
+
+    <template id="orderRowTemplate">
+      <tr>
+        <td data-label="Order #"><input class="order-number" aria-label="Order number" placeholder="02411761" required /></td>
+        <td data-label="Customer"><input class="customer" aria-label="Customer name" placeholder="Customer name" required /></td>
+        <td data-label="Activation"><input class="activation" aria-label="Activation date" type="date" required /></td>
+        <td data-label="Product"><input class="product" aria-label="Product" placeholder="HSI Solo Fiber Max" required /></td>
+        <td data-label="Commission"><div class="money-input"><span>$</span><input class="commission" aria-label="Commission amount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="450.00" required /></div></td>
+        <td class="remove-cell"><button class="remove" type="button" aria-label="Remove order">×</button></td>
+      </tr>
+    </template>
+
+    <footer>Home Front Solutions · Customer acquisition from first click to completed install.</footer>
+  </body>
+</html>
