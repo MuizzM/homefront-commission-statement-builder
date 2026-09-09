@@ -96,35 +96,43 @@ async function generatePdf() {
     const gold = [245, 185, 66];
     const muted = [90, 107, 118];
 
-    doc.setFillColor(...navy); doc.rect(0, 0, 612, 96, "F");
-    doc.setFillColor(...gold); doc.rect(0, 96, 612, 4, "F");
-    try { doc.addImage(await loadLogo(), "PNG", 42, 13, 70, 70); } catch (_) {}
-    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(15);
-    doc.text("HOME FRONT SOLUTIONS", 128, 39);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(205, 221, 234);
-    doc.text("Customer acquisition from first click to completed install.", 128, 57);
+    doc.setFillColor(...navy); doc.rect(0, 0, 612, 78, "F");
+    doc.setFillColor(...gold); doc.rect(0, 78, 612, 3, "F");
+    try { doc.addImage(await loadLogo(), "PNG", 36, 10, 58, 58); } catch (_) {}
+    doc.setTextColor(255, 255, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+    doc.text("HOME FRONT SOLUTIONS", 106, 31);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(205, 221, 234);
+    doc.text("Commission & payout services", 106, 47);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(255, 255, 255);
+    doc.text("COMMISSION STATEMENT", 570, 31, { align: "right" });
+    doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(205, 221, 234);
+    doc.text(formatDate(statementDate), 570, 47, { align: "right" });
 
-    doc.setTextColor(...navy); doc.setFont("helvetica", "bold"); doc.setFontSize(22); doc.text("Commission Statement", 42, 142);
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(...muted);
-    doc.text(`Prepared for: ${repName}`, 42, 164);
-    doc.text(`Statement date: ${formatDate(statementDate)}`, 250, 164);
-    doc.text(`Status: ${status}`, 468, 164);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(...teal); doc.text("PAYABLE TO", 42, 111);
+    doc.setTextColor(...navy); doc.setFontSize(19); doc.text(repName, 42, 133);
+    doc.setFillColor(233, 240, 247); doc.roundedRect(493, 105, 77, 25, 12, 12, "F");
+    doc.setTextColor(...teal); doc.setFontSize(8); doc.text(status.toUpperCase(), 531.5, 121, { align: "center" });
 
-    doc.setFillColor(244, 247, 249); doc.roundedRect(42, 184, 528, 62, 5, 5, "F");
-    doc.setTextColor(...navy); doc.setFont("helvetica", "bold"); doc.setFontSize(17); doc.text(String(orders.length), 96, 210, { align: "center" }); doc.text(currency.format(total), 245, 210, { align: "center" }); doc.text(`−${currency.format(reserve)}`, 390, 210, { align: "center" }); doc.text(currency.format(netPayout), 520, 210, { align: "center" });
-    doc.setFontSize(7.5); doc.setTextColor(...teal); doc.text("ORDERS", 96, 229, { align: "center" }); doc.text("GROSS COMMISSION", 245, 229, { align: "center" }); doc.text("CHARGEBACK RESERVE", 390, 229, { align: "center" }); doc.text("NET PAYOUT", 520, 229, { align: "center" });
+    doc.setFillColor(244, 247, 249); doc.roundedRect(42, 151, 528, 72, 6, 6, "F");
+    doc.setDrawColor(220, 229, 236); doc.line(218, 163, 218, 211); doc.line(394, 163, 394, 211);
+    const orderLabel = `${orders.length} ${orders.length === 1 ? "ORDER" : "ORDERS"}`;
+    doc.setTextColor(...teal); doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.text(`GROSS COMMISSION  •  ${orderLabel}`, 61, 174); doc.text("CHARGEBACK RESERVE", 237, 174);
+    doc.setTextColor(...navy); doc.setFontSize(17); doc.text(currency.format(total), 61, 200); doc.text(`-${currency.format(reserve)}`, 237, 200);
+    doc.setFillColor(...navy); doc.roundedRect(410, 159, 145, 56, 5, 5, "F");
+    doc.setTextColor(...gold); doc.setFontSize(7); doc.text("NET PAYOUT", 426, 177);
+    doc.setTextColor(255, 255, 255); doc.setFontSize(19); doc.text(currency.format(netPayout), 426, 201);
 
     doc.autoTable({
-      startY: 268,
+      startY: 247,
       head: [["Order #", "Customer", "Activation", "Product", "Commission"]],
       body: orders.map((item) => [item.order, item.customer, formatDate(item.activation), item.product, currency.format(item.commission)]),
-      foot: [["", "", "", "GRAND TOTAL", currency.format(total)]],
-      theme: "grid",
+      foot: [["", "", "", "GROSS TOTAL", currency.format(total)]],
+      theme: "plain",
       margin: { left: 42, right: 42, bottom: 55 },
-      headStyles: { fillColor: teal, textColor: 255, fontStyle: "bold", fontSize: 8 },
-      bodyStyles: { textColor: navy, fontSize: 8, cellPadding: 6, lineColor: [218, 228, 236], lineWidth: .5 },
+      headStyles: { fillColor: teal, textColor: 255, fontStyle: "bold", fontSize: 8, cellPadding: 7 },
+      bodyStyles: { textColor: navy, fontSize: 8, cellPadding: 7, lineColor: [224, 231, 237], lineWidth: { bottom: .45 } },
       alternateRowStyles: { fillColor: [245, 248, 250] },
-      footStyles: { fillColor: navy, textColor: 255, fontStyle: "bold", fontSize: 9 },
+      footStyles: { fillColor: [233, 240, 247], textColor: navy, fontStyle: "bold", fontSize: 9, cellPadding: 7 },
       columnStyles: { 0: { cellWidth: 68 }, 1: { cellWidth: 105 }, 2: { cellWidth: 78 }, 3: { cellWidth: 191 }, 4: { cellWidth: 86, halign: "right" } },
       didDrawPage(data) {
         const pageHeight = doc.internal.pageSize.height;
@@ -135,15 +143,14 @@ async function generatePdf() {
       },
     });
 
-    const lastY = doc.lastAutoTable.finalY + 18;
+    const lastY = doc.lastAutoTable.finalY + 16;
     if (lastY < 690) {
-      doc.setFillColor(244, 247, 249); doc.roundedRect(42, lastY, 528, 66, 5, 5, "F");
-      doc.setTextColor(...navy); doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.text("Chargeback Reserve", 55, lastY + 19);
-      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...muted);
-      doc.text(`${orders.length} deals × ${currency.format(chargebackRate)} held per deal`, 55, lastY + 37);
-      doc.setFont("helvetica", "bold"); doc.setTextColor(...navy); doc.text(`Reserve held: ${currency.format(reserve)}`, 557, lastY + 20, { align: "right" }); doc.text(`Net payout: ${currency.format(netPayout)}`, 557, lastY + 39, { align: "right" });
-      doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...muted);
-      doc.text("Reserve is retained against potential chargebacks and is not included in the current net payout.", 55, lastY + 54);
+      doc.setDrawColor(215, 225, 233); doc.setLineWidth(.7); doc.roundedRect(42, lastY, 528, 60, 5, 5, "S");
+      doc.setTextColor(...teal); doc.setFont("helvetica", "bold"); doc.setFontSize(7); doc.text("CHARGEBACK HOLD", 56, lastY + 18);
+      doc.setTextColor(...navy); doc.setFontSize(10); doc.text(`${orders.length} ${orders.length === 1 ? "order" : "orders"} x ${currency.format(chargebackRate)}`, 56, lastY + 37);
+      doc.setFontSize(8); doc.setTextColor(...muted); doc.text("Held against potential order chargebacks", 56, lastY + 51);
+      doc.setTextColor(...teal); doc.setFontSize(7); doc.text("AMOUNT PAYABLE", 556, lastY + 18, { align: "right" });
+      doc.setTextColor(...navy); doc.setFontSize(16); doc.text(currency.format(netPayout), 556, lastY + 41, { align: "right" });
     }
     if (lastY + 82 < 730) {
       doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...muted);
