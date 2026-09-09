@@ -1,6 +1,6 @@
 # Home Front Solutions Commission Statement Builder
 
-A static, browser-only tool that creates branded commission statement PDFs. It accepts a representative name, statement date/status, a configurable chargeback hold per deal, and any number of order rows containing order number, customer, activation date, product, and commission. Each PDF shows gross commission, chargeback reserve, and net payout.
+A static, browser-only tool that creates branded commission statement PDFs. It accepts a representative name, statement date/status, a configurable chargeback hold per deal, and any number of order rows containing order number, customer, activation date, ISP, product, and commission. ISP defaults to Kinetic. Each PDF shows gross commission, chargeback reserve, and net payout.
 
 ## Privacy
 

@@ -29,6 +29,7 @@ function readOrders() {
     order: row.querySelector(".order-number").value.trim(),
     customer: row.querySelector(".customer").value.trim(),
     activation: row.querySelector(".activation").value,
+    isp: row.querySelector(".isp").value.trim(),
     product: row.querySelector(".product").value.trim(),
     commission: Number(row.querySelector(".commission").value || 0),
   }));
@@ -124,16 +125,16 @@ async function generatePdf() {
 
     doc.autoTable({
       startY: 247,
-      head: [["Order #", "Customer", "Activation", "Product", "Commission"]],
-      body: orders.map((item) => [item.order, item.customer, formatDate(item.activation), item.product, currency.format(item.commission)]),
-      foot: [["", "", "", "GROSS TOTAL", currency.format(total)]],
+      head: [["Order #", "Customer", "Activation", "ISP", "Product", "Commission"]],
+      body: orders.map((item) => [item.order, item.customer, formatDate(item.activation), item.isp, item.product, currency.format(item.commission)]),
+      foot: [["", "", "", "", "GROSS TOTAL", currency.format(total)]],
       theme: "plain",
       margin: { left: 42, right: 42, bottom: 55 },
       headStyles: { fillColor: teal, textColor: 255, fontStyle: "bold", fontSize: 8, cellPadding: 7 },
       bodyStyles: { textColor: navy, fontSize: 8, cellPadding: 7, lineColor: [224, 231, 237], lineWidth: { bottom: .45 } },
       alternateRowStyles: { fillColor: [245, 248, 250] },
       footStyles: { fillColor: [233, 240, 247], textColor: navy, fontStyle: "bold", fontSize: 9, cellPadding: 7 },
-      columnStyles: { 0: { cellWidth: 68 }, 1: { cellWidth: 105 }, 2: { cellWidth: 78 }, 3: { cellWidth: 191 }, 4: { cellWidth: 86, halign: "right" } },
+      columnStyles: { 0: { cellWidth: 66 }, 1: { cellWidth: 93 }, 2: { cellWidth: 72 }, 3: { cellWidth: 54 }, 4: { cellWidth: 163 }, 5: { cellWidth: 80, halign: "right" } },
       didDrawPage(data) {
         const pageHeight = doc.internal.pageSize.height;
         doc.setDrawColor(218, 228, 236); doc.line(42, pageHeight - 37, 570, pageHeight - 37);
