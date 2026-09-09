@@ -6,6 +6,7 @@ const message = document.querySelector("#message");
 const currency = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
 document.querySelector("#statementDate").valueAsDate = new Date();
+document.querySelector("#chargebackRate").addEventListener("input", updateSummary);
 
 function addOrder(values = {}) {
   const row = template.content.firstElementChild.cloneNode(true);
@@ -35,8 +36,12 @@ function readOrders() {
 
 function updateSummary() {
   const orders = readOrders();
+  const gross = orders.reduce((sum, item) => sum + item.commission, 0);
+  const reserve = orders.length * Number(document.querySelector("#chargebackRate").value || 0);
   document.querySelector("#orderCount").textContent = String(orders.length);
-  document.querySelector("#commissionTotal").textContent = currency.format(orders.reduce((sum, item) => sum + item.commission, 0));
+  document.querySelector("#commissionTotal").textContent = currency.format(gross);
+  document.querySelector("#chargebackTotal").textContent = `−${currency.format(reserve)}`;
+  document.querySelector("#netPayout").textContent = currency.format(gross - reserve);
 }
 
 function formatDate(date) {
@@ -79,8 +84,11 @@ async function generatePdf() {
     const repName = document.querySelector("#repName").value.trim();
     const statementDate = document.querySelector("#statementDate").value;
     const status = document.querySelector("#statementStatus").value;
+    const chargebackRate = Number(document.querySelector("#chargebackRate").value || 0);
     const orders = readOrders();
     const total = orders.reduce((sum, item) => sum + item.commission, 0);
+    const reserve = orders.length * chargebackRate;
+    const netPayout = total - reserve;
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: "pt", format: "letter" });
     const navy = [11, 37, 64];
@@ -103,8 +111,8 @@ async function generatePdf() {
     doc.text(`Status: ${status}`, 468, 164);
 
     doc.setFillColor(244, 247, 249); doc.roundedRect(42, 184, 528, 62, 5, 5, "F");
-    doc.setTextColor(...navy); doc.setFont("helvetica", "bold"); doc.setFontSize(19); doc.text(String(orders.length), 129, 210, { align: "center" }); doc.text(currency.format(total), 438, 210, { align: "center" });
-    doc.setFontSize(8); doc.setTextColor(...teal); doc.text("QUALIFYING ORDERS", 129, 229, { align: "center" }); doc.text("ESTIMATED PAYOUT", 438, 229, { align: "center" });
+    doc.setTextColor(...navy); doc.setFont("helvetica", "bold"); doc.setFontSize(17); doc.text(String(orders.length), 96, 210, { align: "center" }); doc.text(currency.format(total), 245, 210, { align: "center" }); doc.text(`−${currency.format(reserve)}`, 390, 210, { align: "center" }); doc.text(currency.format(netPayout), 520, 210, { align: "center" });
+    doc.setFontSize(7.5); doc.setTextColor(...teal); doc.text("ORDERS", 96, 229, { align: "center" }); doc.text("GROSS COMMISSION", 245, 229, { align: "center" }); doc.text("CHARGEBACK RESERVE", 390, 229, { align: "center" }); doc.text("NET PAYOUT", 520, 229, { align: "center" });
 
     doc.autoTable({
       startY: 268,
@@ -128,12 +136,21 @@ async function generatePdf() {
     });
 
     const lastY = doc.lastAutoTable.finalY + 18;
-    if (lastY < 730) {
+    if (lastY < 690) {
+      doc.setFillColor(244, 247, 249); doc.roundedRect(42, lastY, 528, 66, 5, 5, "F");
+      doc.setTextColor(...navy); doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.text("Chargeback Reserve", 55, lastY + 19);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...muted);
+      doc.text(`${orders.length} deals × ${currency.format(chargebackRate)} held per deal`, 55, lastY + 37);
+      doc.setFont("helvetica", "bold"); doc.setTextColor(...navy); doc.text(`Reserve held: ${currency.format(reserve)}`, 557, lastY + 20, { align: "right" }); doc.text(`Net payout: ${currency.format(netPayout)}`, 557, lastY + 39, { align: "right" });
       doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...muted);
-      doc.text("This statement reflects qualifying orders pending final validation. Commissions are subject to activation verification, cancellations, chargebacks, and applicable compensation terms.", 42, lastY, { maxWidth: 528 });
+      doc.text("Reserve is retained against potential chargebacks and is not included in the current net payout.", 55, lastY + 54);
+    }
+    if (lastY + 82 < 730) {
+      doc.setFont("helvetica", "normal"); doc.setFontSize(7.5); doc.setTextColor(...muted);
+      doc.text("This statement reflects qualifying orders pending final validation. Commissions are subject to activation verification, cancellations, chargebacks, and applicable compensation terms.", 42, lastY + 82, { maxWidth: 528 });
     }
     doc.save(`${slug(repName)}-commission-statement-${statementDate}.pdf`);
-    message.textContent = `PDF created for ${repName}: ${currency.format(total)}.`;
+    message.textContent = `PDF created for ${repName}: ${currency.format(netPayout)} net after ${currency.format(reserve)} reserve.`;
   } catch (error) {
     console.error(error);
     message.textContent = "The PDF could not be created. Please try again.";

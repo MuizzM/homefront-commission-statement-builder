@@ -30,10 +30,11 @@
           <h2 id="statement-heading">Who is this statement for?</h2>
         </div>
         <p class="privacy">Private by design — entries stay on this device.</p>
-        <div class="details-grid">
+        <div class="details-grid details-grid--four">
           <label>Representative name<input id="repName" autocomplete="name" placeholder="Saad Qadir" required /></label>
           <label>Statement date<input id="statementDate" type="date" required /></label>
           <label>Status<select id="statementStatus"><option>Pending</option><option>Approved</option><option>Paid</option></select></label>
+          <label>Chargeback hold per deal<div class="money-input"><span>$</span><input id="chargebackRate" type="number" min="0" step="0.01" inputmode="decimal" value="50.00" required /></div></label>
         </div>
       </section>
 
@@ -52,7 +53,9 @@
 
       <section class="summary" aria-live="polite">
         <div><span>Orders</span><strong id="orderCount">1</strong></div>
-        <div><span>Total commission</span><strong id="commissionTotal">$0.00</strong></div>
+        <div><span>Gross commission</span><strong id="commissionTotal">$0.00</strong></div>
+        <div><span>Chargeback reserve</span><strong id="chargebackTotal">−$50.00</strong></div>
+        <div class="summary__net"><span>Net payout</span><strong id="netPayout">$0.00</strong></div>
         <button class="button button--primary" id="generatePdf" type="button">Download branded PDF</button>
       </section>
       <p id="message" class="message" role="status"></p>
